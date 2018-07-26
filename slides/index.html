@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>WebVR with A-Frame</title>
+        <link rel="icon" href="favicon.ico">
+		<meta name="description" content="WebVR with A-Frame">
+		<meta name="author" content="Andrzej Mazur">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/end3r.css" id="theme">
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+		<script>
+			if(window.location.search.match(/print-pdf/gi)) {
+				var link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName('head')[0].appendChild(link);
+			}
+		</script>
+		<!--[if lt IE 9]><script src="lib/js/html5shiv.js"></script><![endif]-->
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<section>
+						<h1>WebVR with A-Frame</h1>
+						<img style="border: 0; background: none; box-shadow: none; width: 30%;" src="img/target.png" alt="Quack Whack" />
+						<p>
+							<small><a href="http://end3r.com">Andrzej Mazur</a> &bull; <a href="http://twitter.com/end3r">@end3r</a> &bull; <a href="http://enclavegames.com">Enclave Games</a><br />JSCamp 2018, Barcelona, Spain, July 18th 2018</small>
+						</p>
+					</section>
+				</section>
+
+				<section>
+					<h2>Andrzej Mazur</h2>
+					<img style="float: right; width: 30%;" src="img/andrzej-mazur-2014.png" alt="Andrzej Mazur" />
+					<ul>
+						<li>Indie gamedev focusing on HTML5</li>
+						<li><a href="http://end3r.com/">end3r.com</a> website</li>
+						<li><a href="http://enclavegames.com/">Enclave Games</a> studio</li>
+						<li><a href="http://js13kgames.com/">js13kGames</a> competition</li>
+						<li><a href="http://gamedevjsweekly.com/">Gamedev.js Weekly</a> newsletter</li>
+						<li><a href="http://gamedevjs.com/">Gamedev.js</a> meetups and workshops</li>
+						<li><a href="https://wiki.mozilla.org/TechSpeakers">Mozilla Tech Speakers</a> program</li>
+					</ul>
+				</section>
+
+				<section>
+					<section>
+						<h2>Schedule</h2>
+						<ul>
+							<li>09:00 - 13:00</li>
+						</ul>
+					</section>
+					<section>
+						<h2>What we're going to build</h2>
+						<p><img style="border: 0; background: none; box-shadow: none;" src="img/what.jpg" alt="Quack Whack" /></p>
+					</section>
+					<section>
+						<h2>Outline</h2>
+						<ul style="list-style-type:none;">
+							<li>00. Template and intro</li>
+							<li>01. Objects and entities</li>
+							<li>02. Physics and collisions</li>
+							<li>03. Registering new component</li>
+							<li>04. Environment and spawn points</li>
+							<li>05. Images and models</li>
+							<li>06. Polishing gameplay</li>
+							<li>07. Lighting and shadows</li>
+							<li>08. Text and fonts</li>
+							<li>09. Sounds and music</li>
+							<li>10. Score and game over</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Setup</h2>
+						<p>Sources: <a href="https://enclavegames.com/dl/Quack-Whack.zip">enclavegames.com/dl/Quack-Whack.zip</a></p>
+						<p>Live: <a href="https://enclavegames.com/test/quack/index.html">enclavegames.com/test/quack/index.html</a></p>
+						<p>Slides: <a href="http://enclavegames.com/test/quack/slides/">enclavegames.com/test/quack/slides/</a></p>
+					</section>
+					<section>
+						<h2>Setup</h2>
+						<p>Local environment - open up the console</p>
+						<pre><code>cd [folder]
+python -v
+python -m SimpleHTTPServer [port]</code></pre>
+						<pre><code>cd [folder]
+python3 --version
+python3 -m http.server [port]</code></pre>
+						<p><a href="http://0.0.0.0:8000">http://0.0.0.0:8000</a></p>
+					</section>
+					<section>
+						<h2>Glitch</h2>
+						<p><a href="https://glitch.com">glitch.com</a></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>00. Template and intro</h2>
+						<p>Structure of the document.</p>
+					</section>
+					<section>
+						<h2>HTML structure</h2>
+						<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Quack Whack&lt;/title&gt;
+  &lt;script src="js/aframe-0.8.0.min.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+// ...
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+					</section>
+					<section>
+						<h2>A-Frame scene with the box</h2>
+						<pre><code>&lt;a-scene&gt;
+    &lt;a-box color="#0095DD" position="0 1 -3" rotation="20 40 0"&gt;&lt;/a-box&gt;
+&lt;/a-scene&gt;</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>01. Objects and entities</h2>
+						<p>Camera, sky, plane, entity.</p>
+					</section>
+					<section>
+						<h2>Debug statistics</h2>
+						<pre><code>&lt;a-scene stats&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Camera with cursor</h2>
+						<pre><code>&lt;a-camera look-controls wasd-controls position="0 2.5 0"&gt;
+    &lt;a-cursor&gt;&lt;/a-cursor&gt;
+&lt;/a-camera&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Sky</h2>
+						<pre><code>&lt;a-sky color="lightblue"&gt;&lt;/a-sky&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Plane</h2>
+						<pre><code>&lt;a-plane color="lightgreen" rotation="-90 0 0" width="25" height="25"&gt;
+&lt;/a-plane&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Box as entity</h2>
+						<pre><code>&lt;a-entity
+  geometry="primitive: box"
+  material="color: #0095DD"
+  position="0 1 -3"
+  rotation="20 40 0"&gt;
+&lt;/a-entity&gt;</code></pre>
+					</section>
+				</section>				
+
+				<section>
+					<section>
+						<h2>02. Physics and collisions</h2>
+						<ul>
+							<li>Static-body, dynamic-body, collision detection.</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Script in the &lt;head&gt;</h2>
+						<pre><code>&lt;script src="js/aframe-physics-system-3.0.2.min.js"&gt;&lt;/script&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Stats and gravity</h2>
+						<pre><code>&lt;a-scene physics="gravity: -5" stats&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Dynamic body</h2>
+						<pre><code>&lt;a-box ... dynamic-body="mass: 1;"&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Solid ground</h2>
+						<pre><code>&lt;a-plane ... static-body&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Sphere to collide with</h2>
+						<pre><code>&lt;a-sphere&gt;
+	id="bullet"
+	position="0 0.5 -3"
+	radius="0.3"
+	color="#FFCE00"
+	dynamic-body="mass: 1;"
+&lt;/a-sphere&gt;</code></pre>
+	<pre><code>&lt;a-box id="target" ...&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Collision in JavaScript</h2>
+						<pre><code>&lt;script&gt;
+	const qS = (selector) => document.querySelector(selector);
+	let hit = false;
+	let resetId = 0;
+
+	const resetTarget = () => {};
+
+	qS("#bullet").addEventListener('collide', (e) => {});
+&lt;/script&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Collision function</h2>
+						<pre><code>
+qS("#bullet").addEventListener('collide', (e) => {
+    let target = qS("#target");
+    if(e.detail.body.id === target.body.id &amp;&amp; !hit) {
+        console.log('Collision!');
+        hit = true;
+        clearTimeout(resetId);
+        resetId = setTimeout(resetTarget,4000);
+    }
+});
+						</code></pre>
+					</section>
+					<section>
+						<h2>Resetting the box</h2>
+						<pre><code>
+const resetTarget = () => {
+    clearTimeout(resetId);
+    qS("#target").body.position.set(0, 3, -3);
+    qS("#target").body.velocity.set(0,0,0);
+    qS("#target").body.angularVelocity.set(0,0,0);
+    hit = false;
+    resetId = setTimeout(resetTarget,4000);
+}
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>03. Registering new component</h2>
+						<p>Let's take advantage of "click" emulation in VR.</p>
+					</section>
+					<section>
+						<h2>New file</h2>
+						<pre><code>
+&lt;script src="js/cursor-listener.js"&gt;&lt;/script&gt;
+						</code></pre>
+					</section>
+					<section>
+						<h2>The actual component</h2>
+						<pre><code>
+AFRAME.registerComponent('cursor-listener', {
+    init: function () {
+        this.el.addEventListener('click', function (evt) {
+            console.log('Click!');
+        });
+    }
+});
+						</code></pre>
+					</section>
+					<section>
+						<h2>Attach component to an entity</h2>
+						<pre><code>
+&lt;a-box ... cursor-listener&gt;
+						</code></pre>
+					</section>
+					<section>
+						<h2>Cursor fusing</h2>
+						<pre><code>
+&lt;a-camera look-controls wasd-controls position="0 2.5 0"&gt;
+    &lt;a-entity
+    	cursor="fuse: true; fuseTimeout: 1"
+    	position="0 0 -1"
+    	geometry="primitive: ring; radiusInner: 0.03; radiusOuter: 0.04;"
+    	material="color: white; shader: flat;"&gt;
+    &lt;/a-entity&gt;
+&lt;/a-camera&gt;
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>04. Environment and spawn points</h2>
+						<p>Boxes with covers.</p>
+					</section>
+					<section>
+						<h2>3 boxes, 5 covers</h2>
+						<pre><code>&lt;a-box position="0 0.5 -4" color="#CCCCCC" width="8" height="1.25" depth="1"&gt;
+	&lt;a-box class="spot" color="#DDDDDD" position="-3 0.65 0" dynamic-body="mass: 0;" width="0.75" height="0.05" depth="0.75"&gt;&lt;/a-box&gt;
+	&lt;a-box class="spot" color="#DDDDDD" position="0 0.65 0" dynamic-body="mass: 0;" width="0.75" height="0.05" depth="0.75"&gt;&lt;/a-box&gt;
+	&lt;a-box class="spot" color="#DDDDDD" position="3 0.65 0" dynamic-body="mass: 0;" width="0.75" height="0.05" depth="0.75"&gt;&lt;/a-box&gt;
+&lt;/a-box&gt;
+
+&lt;a-box position="-4.5 0.5 -2.5" color="#CCCCCC" width="4" height="1.25" depth="1" rotation="0 90 0"&gt;
+	&lt;a-box class="spot" color="#DDDDDD" position="-0.5 0.65 0" dynamic-body="mass: 0;" width="0.75" height="0.05" depth="0.75"&gt;&lt;/a-box&gt;
+&lt;/a-box&gt;
+
+&lt;a-box position="4.5 0.5 -2.5" color="#CCCCCC" width="4" height="1.25" depth="1" rotation="0 90 0"&gt;
+	&lt;a-box class="spot" color="#DDDDDD" position="-0.5 0.65 0" dynamic-body="mass: 0;" width="0.75" height="0.05" depth="0.75"&gt;&lt;/a-box&gt;
+&lt;/a-box&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Spawn points</h2>
+						<pre><code>let targetPos = [[-4.5,4,-2],[-3,4,-4],[0,4,-4],[3,4,-4],[4.5,4,-2]];
+let oldPos = 2;
+let randPos = 2;</code></pre>
+					</section>
+					<section>
+						<h2>New positions</h2>
+						<pre><code>oldPos = randPos;
+do {
+    randPos = Math.floor(Math.random()*Math.floor(5));
+}
+while (randPos === oldPos);
+qS("#target").body.position.set(targetPos[randPos][0],targetPos[randPos][1],targetPos[randPos][2]);</code></pre>
+					</section>
+					<section>
+						<h2>Behold... a pixelated duck!</h2>
+						<pre><code>&lt;a-sphere id="bullet" position="0 0.5 -3" radius="0.3" dynamic-body="mass: 1;" opacity="0"&gt;
+  &lt;a-box position="0 0.5 0" id="body" color="#FF9500" width="1" height="0.5" depth="0.5"&gt;&lt;/a-box&gt;
+  &lt;a-box position="0.1 0.5 0.25" id="wing-left" color="black" width="0.5" height="0.25" depth="0.25"&gt;&lt;/a-box&gt;
+  &lt;a-box position="0.1 0.5 -0.25" id="wing-right" color="black" width="0.5" height="0.25" depth="0.25"&gt;&lt;/a-box&gt;
+  &lt;a-box position="-0.5 0.75 0" id="tail" color="black" width="0.1" height="0.1" depth="0.4"&gt;&lt;/a-box&gt;
+
+  &lt;a-box position="0.2 0.85 0" id="head" color="black" width="0.4" height="0.25" depth="0.4"&gt;&lt;/a-box&gt;
+  &lt;a-box position="0.5 0.85 0" id="nose" color="#FF9500" width="0.2" height="0.1" depth="0.1"&gt;&lt;/a-box&gt;
+
+  &lt;a-box position="0.4 0.91 0.12" id="eye-left" color="#FF9500" width="0.02" height="0.1" depth="0.1"&gt;&lt;/a-box&gt;
+  &lt;a-box position="0.41 0.91 0.12" id="pupil-left" color="black" width="0.004" height="0.02" depth="0.02"&gt;&lt;/a-box&gt;
+
+  &lt;a-box position="0.4 0.91 -0.12" id="eye-right" color="#FF9500" width="0.02" height="0.1" depth="0.1"&gt;&lt;/a-box&gt;
+  &lt;a-box position="0.41 0.91 -0.12" id="pupil-right" color="black" width="0.004" height="0.02" depth="0.02"&gt;&lt;/a-box&gt;
+&lt;/a-sphere&gt;</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>05. Images and models</h2>
+						<p>Adding the visuals.</p>
+					</section>
+					<section>
+						<h2>Assets</h2>
+						<pre><code>&lt;a-assets&gt;
+  &lt;img id="sky" src="img/sky.png"&gt;
+  &lt;img id="ground" src="img/ground.png"&gt;
+  &lt;img id="spot" src="img/spot.png"&gt;
+  &lt;img id="stone" src="img/stone.png"&gt;
+  &lt;img id="targetImg" src="img/target.png"&gt;
+  &lt;a-asset-item id="duck" src="models/duck/DuckyMesh.gltf"&gt;&lt;/a-asset-item&gt;
+&lt;/a-assets&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Sky image</h2>
+						<pre><code>&lt;a-sky src="#sky"&gt;&lt;/a-sky&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Ground image</h2>
+						<pre><code>&lt;a-plane src="#ground" ...&gt;&lt;/a-plane&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Stone image</h2>
+						<pre><code>&lt;a-box src="#stone" ...&gt;&lt;/a-box&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Spot image</h2>
+						<pre><code>&lt;a-box src="#spot" ...&gt;&lt;/a-box&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Target image</h2>
+						<pre><code>&lt;a-box src="#targetImg" ...&gt;&lt;/a-box&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Models</h2>
+						<p><a href="https://sketchfab.com/">sketchfab.com</a></p>
+					</section>
+					<section>
+						<h2>Duck model</h2>
+						<pre><code>&lt;a-sphere
+  id="bullet"
+  position="0 0.5 -3"
+  radius="0.3"
+  opacity="0"
+  dynamic-body="mass: 1;"&gt;
+    &lt;a-entity position="0 -0.2 0" gltf-model="#duck"&gt;&lt;/a-entity&gt;
+&lt;/a-sphere&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Dummy duck attached to a camera</h2>
+						<pre><code>&lt;a-entity id="dummy" position="1 -0.5 -0.2" gltf-model="#duck"&gt;&lt;/a-entity&gt;</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>06. GAMEPLAY</h2>
+						<p>Gravity versus velocity, and launching the duck.</p>
+					</section>
+					<section>
+						<h2>Zero gravity</h2>
+						<pre><code>&lt;a-scene physics="gravity: 0" stats&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Hiding the bullet</h2>
+						<pre><code>&lt;a-sphere id="bullet" position="0 -5 0" ...&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Needed variables</h2>
+						<pre><code>let shootingAllowed = true;
+let velo = 0;
+let dVelo = -0.05;</code></pre>
+					</section>
+					<section>
+						<h2>Increasing velocity on hit</h2>
+						<pre><code>const resetTarget = () => {
+    // ...
+    velo += dVelo;
+    qS("#target").body.velocity.set(0,velo,0);
+    qS("#target").setAttribute("rotation", "0 0 0");
+    hit = false;
+    let randX = (Math.random()*2)-1;
+    let randY = (Math.random()*2)-1;
+    let randZ = (Math.random()*2)-1;
+    qS("#target").body.angularVelocity.set(randX, randY, randZ);
+}</code></pre>
+					</section>
+					<section>
+						<h2>Launching the duck</h2>
+						<pre><code>AFRAME.registerComponent('cursor-listener', {
+    init: function () {
+        this.el.addEventListener('click', function (evt) {
+            console.log("Click!");
+            if(shootingAllowed) {
+            	// ...
+            }
+        });
+    }
+});</code></pre>
+					</section>
+					<section>
+						<h2>Setting the position and direction</h2>
+						<pre><code>var camPos = AFRAME.scenes[0].camera.getWorldPosition();
+qS("#bullet").body.position.set(camPos.x, camPos.y, camPos.z);
+var worldDir = AFRAME.scenes[0].camera.getWorldDirection();
+worldDir.multiplyScalar(10);
+qS("#bullet").body.velocity.set(worldDir.x, worldDir.y, worldDir.z);</code></pre>
+					</section>
+					<section>
+						<h2>Random angular velocity</h2>
+						<pre><code>let randX = Math.floor(Math.random()*Math.floor(20)-10);
+let randY = Math.floor(Math.random()*Math.floor(20)-10);
+let randZ = Math.floor(Math.random()*Math.floor(20)-10);
+qS("#bullet").body.angularVelocity.set(randX, randY, randZ);</code></pre>
+					</section>
+					<section>
+						<h2>Hiding and showing the dummy duck</h2>
+						<pre><code>qS("#dummy").setAttribute("position","0 -5 0");
+shootingAllowed = false;
+cooldownTimer = setTimeout(function() {
+    shootingAllowed = true;
+    qS("#dummy").setAttribute("position","1 -0.5 -0.2");
+}, 500);</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>07. Lighting and shadows</h2>
+						<p>In the spotlight.</p>
+					</section>				
+					<section>
+						<h2>Directional light</h2>
+						<pre><code>&lt;a-entity
+  light="type: directional; color: #FFFFFF; intensity: 0.8; castShadow: true;"
+  position="10 20 10"&gt;
+&lt;/a-entity&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Hemisphere light</h2>
+						<pre><code>&lt;a-entity
+  light="type: hemisphere; color: #FFFFFF; groundColor: #CCCCCC; intensity: 0.3;"&gt;
+&lt;/a-entity&gt;</code></pre>
+					</section>
+					<section>
+						<h2>The Dark Duck Rises</h2>
+						<pre><code>&lt;a-entity
+  light="type: point; intensity: 2; distance: 1.5; decay: 1; color: yellow;"
+  position="-0.5 0.5 0.5"&gt;
+&lt;/a-entity&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Receiving shadows</h2>
+						<pre><code>&lt;a-plane ... shadow="receive: true;"&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Shadow of the duck</h2>
+						<pre><code>&lt;a-entity ... gltf-model="#duck" shadow="cast: true; receive: false;"&gt;
+&lt;/a-entity&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Shadow of the target</h2>
+						<pre><code>&lt;a-box id="target" ... shadow="cast: true; receive: false;"&gt;
+&lt;/a-box&gt;</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>08. Text and fonts</h2>
+						<p>Write it down.</p>
+					</section>
+					<section>
+						<h2>Example text</h2>
+						<pre><code>&lt;a-text
+  value="Some text"
+  position="-0.4 0.3 0.6"
+  color="#FFCE00"&gt;
+&lt;/a-text&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Custom font</h2>
+						<pre><code>&lt;a-text
+  font="fonts/mozillavr.fnt"
+  value="Lorem ipsum"
+  position="-0.4 0.3 0.6"
+  color="#FFCE00"&gt;
+&lt;/a-text&gt;</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>09. Sounds and music</h2>
+						<p>Be audible about it.</p>
+					</section>
+					<section>
+						<h2>Sound effect</h2>
+						<pre><code>&lt;a-entity
+  ...
+  gltf-model="#duck"
+  ... 
+  sound="src: url(sfx/quack.wav); autoplay: false; loop: false;"&gt;
+&lt;/a-entity&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Playing the sound on collision</h2>
+						<pre><code>target.components.sound.playSound();</code></pre>
+					</section>
+					<section>
+						<h2>Ambient music</h2>
+						<pre><code>&lt;a-scene
+  stats
+  sound="src: url(sfx/cartoonish-loop.wav); loop: true; autoplay: true; volume: 0.3;"&gt;
+&lt;/a-scene&gt;</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>10. Score and game over</h2>
+						<p>Get the point.</p>
+					</section>
+					<section>
+						<h2>The score</h2>
+						<pre><code>&lt;a-text
+  id="score"
+  font="fonts/mozillavr.fnt"
+  value="Score: 0"
+  position="-0.4 0.3 0.6"
+  color="#FFCE00"&gt;
+&lt;/a-text&gt;</code></pre>
+					</section>
+					<section>
+						<h2>Updating the score</h2>
+						<pre><code>let score = 0;
+
+// ...
+
+score = score + 1;
+
+// ...
+
+qS("#score").setAttribute('text','value','Score: '+score);</code></pre>
+					</section>
+					<section>
+						<h2>Extra: game over</h2>
+						<p>Game states: playing vs showing the score</p>
+					</section>
+				</section>
+
+				<section>
+					<h1>Thanks!</h1>
+					<p>&nbsp;</p>
+					<h2>Questions?</h2>
+					<p>&nbsp;</p>
+					<p>&nbsp;</p>
+					<h4><a href="http://end3r.com">Andrzej.Mazur@end3r.com</a> &bull; <a href="http://twitter.com/end3r">@end3r</a> &bull; <a href="http://enclavegames.com">Enclave Games</a></h4>
+				</section>
+			</div>
+		</div>
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+		<script>
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				theme: Reveal.getQueryHash().theme,
+				transition: Reveal.getQueryHash().transition || 'linear',
+				backgroundTransition: 'slide',
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/gamepad/gamepad.js', async: true }
+				]
+			});
+		</script>
+
+		<img src="img/ender.png" style="position: absolute; bottom: 0; left: 0;" alt="Ender" />
+		<img src="img/efka.png" style="position: absolute; bottom: 0; right: 0;" alt="Efka" />
+		<a target="_blank" style="position: absolute; top: 15px; left: 15px; display: block; color: #7FBF1C; text-decoration: none; font-weight: bold;" href="https://twitter.com/end3r">@end3r</a>
+
+		<script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-10280552-6']);
+		  _gaq.push(['_trackPageview']);
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		</script>		
+	</body>
+</html>
